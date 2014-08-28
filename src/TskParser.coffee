@@ -4,19 +4,45 @@ fs = require 'fs'
 class MapFileConfiguration
 	@bitSet=[]
 	constructor: (@value) ->
-		@bitSet=@value.toString(2).split('')
-	@headerInformation=()->
-		@value.
+		@bitSet=@value.toString(2).split('').reverse()
+	getRawData:()->
+		ret=@bitSet
+		ret.reverse()
+		return parseInt(ret.join(''),2)
+	headerInformation:(bitValue)->
+		if bitValue?
+			@bitSet[0]=value
+		return @bitSet[0]||0
+	testResultInformationPerDie:(bitValue)->
+		if bitValue?
+			@bitSet[1]=value
+		return @bitSet[1]||0
+	lineCategoryInformation:(bitValue)->
+		if bitValue?
+			@bitSet[2]=value
+		return @bitSet[2]||0
+	extensionHeaderInformation:(bitValue)->
+		if bitValue?
+			@bitSet[3]=value
+		return @bitSet[3]||0
+	testResultInformationPerExtensionDie:(bitValue)->
+		if bitValue?
+			@bitSet[4]=value
+		return @bitSet[4]||0
+	extensionLineCategoryInformation:(bitValue)->
+		if bitValue?
+			@bitSet[5]=value
+		return @bitSet[5]||0
 
 
 
 module.exports = class TskParser
 	constructor: (filePath) ->
 		fs.readFile "test/001.QR2352-D5U278-CP-1",(err,data)->
-			# console.log data.length
 
 			br=new BinaryReader(data)
 
+			# Map File Header Start
 
 			# Wafer Testing Setup Data
 			operatorName =br.readAsString(20)
@@ -29,6 +55,11 @@ module.exports = class TskParser
 			finalEditingMachineType  = br.readAsInt(1)
 
 			# Map Version
+			# 0:Normal
+			# 1: 250,000 Chilps
+			# 2: 256 Multi-sites
+			# 3: 256 Multi-sites (without extended header information)
+			# 4: 1024 category
 			mapVersion=br.readAsInt(1)
 
 			mapDataAreaRowSize=br.readAsInt(2)
@@ -117,10 +148,25 @@ module.exports = class TskParser
 			linCategoryAddress=br.readAsInt(4)
 
 			# Extended Map Inforamtion
-			mapFileConfiguration=br.readAsBit(2)
+			mapFileConfiguration=new MapFileConfiguration(br.readAsBit(2))
 			maxMultiSite=br.readAsInt(2)
-			maxCategory=br.readAsInt(2)
+			maxCategories=br.readAsInt(2)
 			reserved=br.readAsBytes(2)
+
+			# Map File Header End
+
+
+			m.headerInformation()
+			# Die Result Area
+			# if @mapVersion
+				# ...
+			# _dieCount=mapDataAreaRowSize*mapDataAreaLineSize
+			# _dieResultPost
+			# for i in [0..._dieCount]
+
+
+
+
 
 
 
@@ -128,12 +174,8 @@ module.exports = class TskParser
 
 
 			# console.log totalPassDice
-			console.log mapFileConfiguration
-			console.log maxMultiSite
-			console.log maxCategory
-
-			console.log br.position
-
+			console.log "---------"
+			console.log mapVersion
 
 
 			# waferSize = br.readBytes()

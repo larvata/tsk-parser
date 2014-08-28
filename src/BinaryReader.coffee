@@ -4,10 +4,12 @@ module.exports = class BinaryReader
 		@position=0
 
 	readAsBytes:(bytes,preventAutoForward)->
+		ret=@buffer.slice(@position,@position+bytes);
 		if preventAutoForward? and preventAutoForward
+		else
 			@position+=bytes
 
-		return @buffer.slice(@position,@position)
+		return ret
 
 	readAsString:(bytes,preventAutoForward)->
 		return @readAsBytes(bytes).toString()
