@@ -23,6 +23,12 @@ module.exports = class BinaryReader
 	readAsBit:(bytes,preventAutoForward)->
 		return @readAsInt(bytes).toString(2)
 
+	skip:(bytesToSkip)->
+		@position+=bytesToSkip
+
+	goto:(position)->
+		@position=position
+
 
 
 
